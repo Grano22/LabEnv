@@ -1,0 +1,1387 @@
+class ExampleAction extends ActionOperation {
+    name = "Example action name";
+    description = "Example action description";
+    //Zdarzenia akcji
+    onStore(component, inputData) {
+        component.currDocument.removeSlide(inputData.slideID - 1);
+        if(component.state.currSlide>inputData.slideID) return {currSlide:component.state.currSlide-1};
+    }
+
+    onRestore(component, inputData) {
+        /* Logika zdarzenia */ 
+    }
+
+    onFlush(component, inputData) {
+        /* Logika zdarzenia */ 
+    }
+}
+
+/* Input Data */
+
+        const listItems = this.filterTypes.length>0 ? this.loadedFormulas.filter(nm=>{ if(Array.isArray(f.types)) { let containsIts = 0; for(let tp of nm.types) if(self.filterTypes.includes(tp)) containsIts+=1; return containsIts==self.filterTypes; } else return false; }).map((f, ind)=>(<li id={"formulaItem"+ind} title={f.description[this.options.lang]}><img src={f.icon}/><h4>{f.name[this.options.lang]}</h4></li>)) : this.loadedFormulas.map((f, ind)=>(<li id={"formulaItem"+ind} title={f.description[this.options.lang]}><img src={f.icon}/><h4>{f.name[this.options.lang]}</h4></li>));
+        return withListContainer ? (<ul className="propsalList" onClick={(ev)=>{ if(ev.target.tagName!="UL") { let liNode = function() { let currNode = ev.target; while(currNode.tagName!="LI") currNode = currNode.parentElement; return currNode; }(); self.onSelectItem(ev, this.loadedFormulas[parseInt(liNode.id.replace("formulaItem", ""))]); } }}>
+            {listItems}
+        </ul>) : listItems;
+
+
+          "exports": {
+    ".": "./Jumper.js",
+    "./browser": "./Jumper.browser.mjs"
+  },
+
+
+  RewriteCond %{HTTP_HOST} ^europroject\-lodz\.pl$ [OR]
+RewriteCond %{HTTP_HOST} ^www\.europroject\-lodz\.pl$
+RewriteRule ^/?$ "https\:\/\/europroject\.com\.pl\/" [R=301,L]
+
+
+/* Math Parser by Grano22 Dev | V1 */
+const MathConstans = {
+    "e":Math.e
+}
+
+class MathLinearParser {
+
+    lastNumber = 0;
+    lastOperator = "";
+
+    lastPieces = [];
+    asserts = [];
+    operations = [];
+    pattern = "";
+
+    constructor(initPattern="") {
+        this.pattern = initPattern;
+        if(initPattern!="") this.parse(this.pattern);
+    }
+
+    get assertion() {
+        return this.asserts.map(ae=>ae.join(" ")).join(" = ");
+    }
+
+    factorial() {
+        for(let pieceEl in this.lastPieces) {
+            if(typeof this.lastPieces[pieceEl]=="string" && this.lastPieces[pieceEl].indexOf("!")==0) {
+                let rep = parseFloat(this.lastPieces[pieceEl].replace("!", "")), sp = 1;
+                if(isFinite(rep)) {
+                    for(let i = rep;i>0;i--) sp = sp * i;
+                    this.lastPieces[pieceEl] = sp;
+                    sp = 1;
+                }
+            }
+        }
+        this.asserts.push(this.lastPieces.map(v=>v));
+    }
+
+    multiplication() {
+        /*for(let pieceEl in this.lastPieces) {
+            if(this.lastPieces[pieceEl]=="*") {
+                let lastNum = this.lastPieces[parseInt(pieceEl) - 1], nextNum = this.lastPieces[parseInt(pieceEl) + 1];
+                this.lastPieces.splice(parseInt(pieceEl) - 1, 1);
+                this.lastPieces.splice(parseInt(pieceEl) + 1, 1);
+                this.lastPieces[pieceEl] = parseFloat(lastNum) * parseFloat(nextNum);
+            }
+        }
+        this.asserts.push(this.lastPieces);*/
+        return this.beetwenOperation("*", (lastNum, nextNum)=>{ 
+           return isFinite(lastNum) && isFinite(nextNum) ? parseFloat(lastNum) * parseFloat(nextNum) : lastNum + nextNum;
+        });
+    }
+
+    diff() {
+        return this.beetwenOperation("-", (lastNum, nextNum)=>parseFloat(lastNum) - parseFloat(nextNum))
+    }
+
+    sum() {
+        /*for(let pieceEl in this.lastPieces) {
+            if(this.lastPieces[pieceEl]=="+") {
+                let lastNum = this.lastPieces[parseInt(pieceEl) - 1], nextNum = this.lastPieces[parseInt(pieceEl) + 1];
+                this.lastPieces.splice(parseInt(pieceEl) - 1, 1);
+                this.lastPieces.splice(parseInt(pieceEl) + 1, 1);
+                this.lastPieces[pieceEl] = parseFloat(lastNum) + parseFloat(nextNum);
+            }
+        }
+        this.asserts.push(this.lastPieces);*/
+        return this.beetwenOperation("+", (lastNum, nextNum)=>parseFloat(lastNum) + parseFloat(nextNum))
+    }
+
+    beetwenOperation(symbol, returnVal, requireNum=false) {
+        try {
+            for(let pieceEl in this.lastPieces) {
+                if(this.lastPieces[pieceEl]==symbol) {
+                    if(typeof this.lastPieces[parseInt(pieceEl) - 1]!="undefined") {
+                        if(typeof this.lastPieces[parseInt(pieceEl) + 1]!="undefined") {
+                        let lastNum = this.lastPieces[parseInt(pieceEl) - 1], nextNum = this.lastPieces[parseInt(pieceEl) + 1];
+                        if(!requireNum || (isFinite(lastNum) && isFinite(nextNum))) {
+                            this.lastPieces[pieceEl] = returnVal(lastNum, nextNum);
+                            this.lastPieces.splice(parseInt(pieceEl) - 1, 1);
+                            this.lastPieces.splice(parseInt(pieceEl), 1);
+                        } else throw "This operator requires number beetwen operator "+symbol;
+                        } else throw "Next item is unavailable";
+                    } else throw "Previous item is unavailable";
+                }
+            }
+            this.asserts.push(this.lastPieces.map(v=>v));
+            return this.lastPieces;
+        } catch(ErrorBeetweenOperation) {
+            console.error(ErrorBeetweenOperation);
+            return null;
+        }
+    }
+
+    getOperations() {
+        for(let pieceName of this.lastPieces) {
+            switch(pieceName) {
+                case "+":
+                    if(typeof this.operations[5]=="undefined") this.operations[20] = "+";
+                break;
+                case "-":
+                    if(typeof this.operations[5]=="undefined") this.operations[19] = "-";
+                break;
+                case "*":
+                    if(typeof this.operations[5]=="undefined") this.operations[18] = "*";
+                break;
+                case "/":
+                    if(typeof this.operations[5]=="undefined") this.operations[17] = "/";
+                break;
+                case "^":
+                    if(typeof this.operations[5]=="undefined") this.operations[16] = "^";
+                break;
+                case "!":
+                    if(typeof this.operations[5]=="undefined") this.operations[15] = "!";
+                break;
+            }
+        }
+        this.operations = Object.values(this.operations);
+        return this.operations.length>0 ? this.operations : null;
+    }
+
+    parse(tgPattern) {
+        try {
+        this.lastPieces = [];
+        let objsmpl = "", inNr = false, openedBrackets = 0, closedBrackets = 0;
+        for(let patternSample in tgPattern) {
+            if(openedBrackets>0 || tgPattern[patternSample]!=" ") objsmpl += tgPattern[patternSample];
+            switch(tgPattern[patternSample]) {
+                case "(":
+                case "[":
+                    openedBrackets+=1;
+                break;
+            }
+            if(openedBrackets<=0) {
+            switch(tgPattern[patternSample]) {
+                case "+":
+                    if(typeof this.operations[5]=="undefined") this.operations[20] = "+";
+                    this.lastPieces.push(objsmpl);
+                    objsmpl = "";
+                break;
+                case "-":
+                    if(typeof this.operations[5]=="undefined") this.operations[19] = "-";
+                    this.lastPieces.push(objsmpl);
+                    objsmpl = "";
+                break;
+                case "*":
+                    if(typeof this.operations[5]=="undefined") this.operations[18] = "*";
+                    this.lastPieces.push(objsmpl);
+                    objsmpl = "";
+                break;
+                case "/":
+                    if(typeof this.operations[5]=="undefined") this.operations[17] = "/";
+                    this.lastPieces.push(objsmpl);
+                    objsmpl = "";
+                break;
+                case "^":
+                    if(typeof this.operations[5]=="undefined") this.operations[16] = "^";
+                    this.lastPieces.push(objsmpl);
+                    objsmpl = "";
+                break;
+                case "!":
+                    if(typeof this.operations[5]=="undefined") this.operations[15] = "!";
+                    inNr = true;
+                break;
+                default:
+                    let patternAsNum = parseFloat(tgPattern[patternSample]);
+                    if(!inNr && !isNaN(patternAsNum) && isFinite(patternAsNum)) {
+                        if(isNaN(parseFloat(tgPattern[parseInt(patternSample) + 1]))) { this.lastPieces.push(patternAsNum); objsmpl = ""; } else inNr = true;
+                    } else if(typeof MathConstans[tgPattern[patternSample]]!="undefined") {
+                        this.lastPieces.push(objsmpl);
+                        objsmpl = "";
+                    } else if(tgPattern[patternSample]!="." && inNr && isNaN(tgPattern[parseInt(patternSample) + 1]) && tgPattern[parseInt(patternSample) + 1]!=".") { 
+                        if(isNaN(parseFloat(objsmpl)) && objsmpl[0]!="!") throw "Unknown operator before number";
+                        this.lastPieces.push(parseFloat(objsmpl) || objsmpl);
+                        objsmpl = "";
+                        console.log(this.lastPieces, tgPattern[patternSample]);
+                        inNr = false;
+                    } else if(!inNr && tgPattern[patternSample]==".") {
+                        inNr = true;
+                    } else if(tgPattern[patternSample].charCodeAt()>=97 && tgPattern[patternSample].charCodeAt()<=122) {
+                        this.lastPieces.push(objsmpl);
+                        objsmpl = "";
+                    } else if(!inNr && tgPattern[patternSample]!=" ") throw "Unknown character "+tgPattern[patternSample];
+            }
+            }
+            if(openedBrackets>0) {
+                switch(tgPattern[patternSample]) { case ")": case "]": closedBrackets+=1; break; }
+                if(openedBrackets==closedBrackets) {
+                    this.lastPieces.push(objsmpl);
+                    objsmpl = "";
+                    openedBrackets = 0;
+                    closedBrackets = 0;
+                }
+            }
+        }
+        this.asserts.push(this.lastPieces.map(v=>v));
+        } catch(LinearMathParserError) {
+            console.error(LinearMathParserError);
+        }
+        return this.lastPieces;
+    }
+
+    calculate() {
+        for(let operName of this.operations) {
+            if(typeof operName!="undefined") {
+            if(typeof operName=="string") {
+                switch(operName) {
+                    case "!":
+                        this.factorial();
+                    break;
+                    case "*":
+                        this.multiplication();
+                    break;
+                    case "-":
+                        this.diff();
+                    break;
+                    case "+":
+                        this.sum();
+                    break;
+                }
+            }
+            }
+        }
+        this.operations = {};
+        let operations = this.getOperations();
+        if(operations!=null) return this.calculate(); else return this.lastPieces;
+    }
+
+    toString() {
+
+    }
+
+    valueOf() {
+
+    }
+}
+
+import React, {Component} from 'react';
+import Jumper from 'jumper';
+import JumperBrowser from '../../libraries/Browser';
+import UnitesNamespaces from '../../data/UnitsNotations.json';
+
+const currLanguage = Jumper.Browser.language;
+
+export class UnitsExchanger {
+    constructor(unitsNamespace) {
+        this.ns = unitsNamespace;
+        for(let unitCat in this.ns) {
+            this.ns[unitCat] = Object.assign({
+                operation:"*",
+
+            }, this.ns[unitCat]);
+        }
+    }
+
+    getItemsBy(identifiersArr) {
+        if(Array.isArray(identifiersArr)) {
+            for(let i = 0;i<identifiersArr;i++) {
+
+            }
+        }
+    }
+
+    convertTo(valueFrom, fromUnit, toUnit, fromUnitIdentifier="id", toUnitIndentifier="id") {
+        let fromJM = null, targetJM = null;
+        for(let unitCat in this.ns) {
+            if(this.ns[unitCat][fromUnitIdentifier] == fromUnit) {
+
+            } else if(this.ns[unitCat][toUnitIndentifier] == toUnit) {
+
+            }
+        }
+        if(fromJM!=null && targetJM!=null) {
+            switch(fromJM.operation) {
+                case "^":
+
+                break;
+                case "*":
+
+                break;
+                case "/":
+
+                break;
+                case "+":
+
+                break;
+                case "-":
+
+                break;
+            }
+            switch(targetJM.operation) {
+                case "^":
+                    
+                break;
+                case "*":
+
+                break;
+                case "/":
+
+                break;
+                case "+":
+
+                break;
+                case "-":
+                    
+                break;
+            }
+        }
+    }
+
+    calculateConvertionDiff() {
+
+    }
+}
+
+export default class Exchanger extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            title:{
+                en:"Unit converter",
+                pl:"Konwerter jednostek",
+                "pl-PL":"Konwerter jednostek"
+            }
+        }
+    }
+
+    render() {
+        return (<>
+            <header className="wide">
+                <h1>{this.state.title[currLanguage]}</h1>
+            </header>
+            <div className="appSingle">
+                <div className="in">
+                    <div className="unitExchangerTree">
+                        <label>
+                        <span className="unitSymbol">
+
+                        </span>
+                        </label>
+                    </div>
+                    <select>
+                            <option></option>
+                    </select>
+                    <button>Konwertuj</button>
+                </div>
+            </div>
+            </>);
+    }
+}
+
+export function format(targetStr, initialObj=null) {
+    try {
+        let sequences = [], sequence = "", inVarDeclaration = false, outputStr = "";
+        for(let charn in targetStr) {
+            console.log(targetStr[charn], !(targetStr[charn].charCodeAt()>=65 && targetStr[charn].charCodeAt()<=90), !(targetStr[charn].charCodeAt()>=97 && targetStr[charn].charCodeAt()<=122));
+            if(!inVarDeclaration && (typeof targetStr[charn - 1]=="undefined" || targetStr[charn - 1]!="\\") && targetStr[charn]=="$" && targetStr[parseInt(charn) + 1]=="[") {
+                console.log("parsing..");
+                inVarDeclaration = true;
+            } else if(inVarDeclaration && targetStr[charn]=="]") {
+                sequences.push(sequence);
+                sequence = "";
+                inVarDeclaration = false;
+            } else if(inVarDeclaration && targetStr[charn]!="[" && targetStr[charn]!="_" && !(targetStr[charn].charCodeAt()>=65 && targetStr[charn].charCodeAt()<=90) && !(targetStr[charn].charCodeAt()>=97 && targetStr[charn].charCodeAt()<=122)) throw "Invaild symbol "+targetStr[charn]+" at position "+charn;
+            else if(inVarDeclaration) if(targetStr[charn]!="[") sequence += targetStr[charn];
+            console.log(sequences);
+        }
+        outputStr = targetStr;
+        for(let catched in sequences) {
+            outputStr = outputStr.replace("$["+sequence[catched]+"]", initialObj[sequence[catched]]);
+        }
+        return outputStr;
+    } catch(FormatingError) {
+        console.error(FormatingError);
+    }
+}
+
+    output() {
+        let self = this;
+        /*if(Array.isArray(self.outputList)) {
+            if(self.outputList.length>0) { 
+                if(this.filter!=null) {
+                    const localItems =  self.outputList.filter(()=>this.filter()).map(oi=>oi.render());
+                    switch(self.outputList[0].__proto__) {
+                        case SearchListPropsalItem:
+                            return (<ul className="propsalList">{localItems}</ul>);
+                        default:
+                            return localItems;
+                    }
+                } else return self.outputList.map(oi=>oi.render());
+            } else return (<p>No results</p>);
+        } else if(React.isValidElement(self.outputList)) return self.outputList;*/
+
+    }
+
+export function parseHTMLReactComponent(htmlStr, allowedTags=[]) {
+    //inHTMLChar: 0 - nope, 1 - potentially, 2 - parsing attributes, 3 - in tag
+    try {
+        let parsedElements = [], charMetrices = "", lastAttr = "";
+        for(let htmlChar=0;htmlChar<htmlStr.length;htmlChar++) {
+            try {
+                if(inHTMLChar<=0 && htmlStr[htmlChar]=="<" && htmlStr[parseInt(htmlChar + 1)].trim()!="") {
+                    if(charMetrices!="") parsedElements.push(React.createElement(React.Fragment, { textContent:charMetrices }, []));
+                    charMetrices = "";
+                    inHTMLChar = 1;
+                } else if(inHTMLChar==2 && htmlStr[htmlChar]=="=") {
+                    lastAttr = charMetrices;
+                    charMetrices = "";
+                } else if(inHTMLChar==2 && inAttr!="" && htmlStr[parseInt(htmlChar)].trim()=="") {
+                    lastTag.attrs[lastAttr] = charMetrices;
+                    lastAttr = "";
+                } else if((inHTMLChar==1 || inHTMLChar==2) && (htmlStr[parseInt(htmlChar)].trim()=="" || htmlStr[htmlChar]==">")) {
+                    if(htmlStr[htmlChar]==">") inHTMLChar = 3; else inHTMLChar = 2;
+                    lastTag.tagName = charMetrices;
+                    charMetrices = "";
+                } else if(inHTMLChar==3 && htmlStr[htmlChar]=="<" && htmlStr[parseInt(htmlChar) + 1]=="/" && htmlStr.substr(htmlChar, lastTag.tagName.length + 3)==="</"+lastTag.tagName+">") {
+                    lastTag.children = [];
+                    lastTag.textContent = charMetrices;
+                    if(charMetrices!="") lastTag.children = parseHTMLReactComponent(lastTag.textContent);
+                    parsedElements.push(React.createElement(lastTag.tagName, lastTag.attrs, lastTag.children));
+                    inHTMLChar = 0;
+                    htmlStr++;
+                    lastTag = { attrs:{} };
+                } else if(inHTMLChar==1 && htmlStr[htmlChar]=="/" && htmlStr[parseInt(htmlChar) + 1]==">") {
+                    parsedElements.push(React.createElement(lastTag.tagName, lastTag.attrs, lastTag.children));
+                    inHTMLChar = 0;
+                    htmlStr++;
+                    lastTag = { attrs:{} };
+                } else if(htmlStr[htmlChar].length - 1==parseInt(htmlChar) && inHTMLChar>0) {
+                    throw "^Tag hasnt closed, please close specified tag "+lastTag.tagName;
+                } else charMetrices += htmlStr[htmlChar];
+            } catch(PartialParseError) {
+                console.error(PartialParseError, htmlChar);
+            }
+        }
+        return parsedElements;
+        //return React.createElement(React.Fragment, null, parsedChilds);
+    } catch(ParseError) {
+        console.error(ParseError);
+        return React.createElement(React.Fragment, null, []);
+    }
+}
+
+
+/*export function parseReactComponent(htmlStr, allowedTags=[]) {
+    let parsedChilds = [], inHTMLChar = 0, charMetrices = "", potentialTag = "", tags = [], lastTag = { attrs:{} }, lastAttr = "";
+    try {
+    for(let htmlChar in htmlStr) {
+        if(htmlStr[htmlChar]=="<" && htmlStr[parseInt(htmlChar)].trim()!="") {
+            if(inHTMLChar>0) {
+                if() throw "HTML tag cannot be opened may times "+lastTag.tagName;
+                inHTMLChar = 1;
+                if(!inHTMLChar) lastTag = { attrs:{} };
+            } else inHTMLChar = 1;
+        }/^* else if(inHTMLChar && htmlStr[htmlChar].trim()=="" && typeof lastTag.tagName=="undefined") {
+            lastTag.tagName = charMetrices;
+            charMetrices = "";
+        }*^/ else if(inHTMLChar>1 && htmlStr[htmlChar]=="<" && htmlStr.substr(parseInt(htmlChar), lastTag.tagName.length+2)==lastTag.tagName+"/>") {
+            lastTag.textContent = charMetrices;
+            charMetrices = "";
+            tags.push(lastTag);
+            lastTag = { attrs:{} };
+            inHTMLChar = 0;
+        } else if(inHTMLChar && htmlStr[htmlChar]==">" && htmlStr[htmlChar - 1]=="/") {
+            if(inHTMLChar>1) throw "Unclosed tag "+lastTag.tagName;
+            inHTMLChar = 0;
+            tags.push(lastTag);
+            lastTag = { attrs:{} };
+        } else if(inHTMLChar && htmlStr[htmlChar]==">" && htmlStr[htmlChar - 1]!="/") {
+            if(inHTMLChar<2) inHTMLChar = 2; //else throw "";
+        } else if(lastAttr=="" && inHTMLChar && htmlStr[htmlChar]=="=") {
+            lastAttr = charMetrices;
+            charMetrices = "";
+        } else if(lastAttr!="" && htmlStr[htmlChar].trim()=="") {
+            lastTag.attrs[lastAttr] = charMetrices;
+            lastAttr = ""; 
+        }
+    }
+    for(let htmlPattern in tags) {
+        if(typeof tags[htmlPattern]=="string") {
+            parsedChilds.push(React.createElement(React.Fragment, { textContent:tags[htmlPattern] }, []));
+        } else {
+            parsedChilds.push(React.createElement(tags[htmlPattern].tagName, tags[htmlPattern].attrs, tags[htmlPattern].textContent));
+        }
+    }
+    return React.createElement(React.Fragment, null, parsedChilds);
+    } catch(ParseError) {
+        console.error(ParseError);
+        return React.createElement(React.Fragment, null, []);
+    }
+}*/
+
+export function parseHTMLReactComponent(htmlStr, allowedTags=[]) {
+    try {
+        let parsedElements = [], charMetrices = "", inHTMLChar = 0, lastTag = { attrs:{} }, inAttr = false;
+        for(let htmlChar=0;htmlChar<htmlStr.length;htmlChar++) {
+            try {
+                if(inHTMLChar<=0 && htmlStr[htmlChar]=="<" && htmlStr[parseInt(htmlChar + 1)].trim()!="") {
+                    if(charMetrices!="") parsedElements.push(React.createElement(React.Fragment, {}, [charMetrices]));
+                    charMetrices = "";
+                    inHTMLChar = 1;
+                } else if(!inAttr && inHTMLChar==2 && (htmlStr[parseInt(htmlChar)].trim()=="" || htmlStr[htmlChar]==">" || (htmlStr[htmlChar]=="/" && htmlStr[parseInt(htmlChar) + 1]==">")) && htmlStr[parseInt(htmlChar) - 1].trim()!="") {
+                    if(charMetrices.indexOf('"')>0 && charMetrices[charMetrices.indexOf('"') - 1]=="=") {
+                        let attrName, attrVal;
+                        attrName = charMetrices.split("=");
+                        attrVal = attrName[1].substring(1, attrName[1].length - 1);
+                        attrName = attrName[0];
+                        if(attrName=="style") {
+                            let entries = attrVal.split(";"), tempProps = {}, params = [];
+                            for(let entry in entries) {
+                                params = entries[entry].split(":");
+                                while(params[0].indexOf("-")>-1) { if(true || params[0].indexOf("-")>0) { params[0] = params[0].split(""); params[0][params[0].indexOf("-") + 1] = params[0][params[0].indexOf("-") + 1].toUpperCase(); params[0] = params[0].join(""); } params[0] = params[0].replace("-", ""); }
+                                tempProps[params[0]] = params[1];
+                            }
+                            attrVal = tempProps;
+                        }
+                        lastTag.attrs[attrName] = attrVal;
+                        charMetrices = "";
+                    } else {
+                        lastTag.attrs[charMetrices] = true;
+                        charMetrices = "";
+                    }
+                    if(htmlStr[htmlChar]==">") inHTMLChar = 3;
+                    else if(htmlStr[htmlChar]=="/") {
+                        parsedElements.push(React.createElement(lastTag.tagName, lastTag.attrs, []));
+                        inHTMLChar = 0;
+                        htmlChar += 2;
+                        lastTag = { attrs:{} };
+                    }
+                    
+                } else if(inHTMLChar==2 && htmlStr[htmlChar]==">") {
+                    inHTMLChar = 3;
+                } else if(inHTMLChar==1 && (htmlStr[parseInt(htmlChar)].trim()=="" || htmlStr[htmlChar]==">")) {
+                    if(htmlStr[htmlChar]==">") inHTMLChar = 3; else inHTMLChar = 2;
+                    lastTag.tagName = charMetrices;
+                    charMetrices = "";
+                } else if(inHTMLChar==3 && htmlStr[htmlChar]=="<" && htmlStr[parseInt(htmlChar) + 1]=="/" && htmlStr.substr(htmlChar, lastTag.tagName.length + 3)==="</"+lastTag.tagName+">") {
+                    lastTag.children = [];
+                    lastTag.textContent = charMetrices;
+                    if(charMetrices!="") lastTag.children = parseHTMLReactComponent(lastTag.textContent);
+                    parsedElements.push(React.createElement(lastTag.tagName, lastTag.attrs, Array.isArray(lastTag.children) ? lastTag.children : [lastTag.children]));
+                    inHTMLChar = 0;
+                    htmlChar += lastTag.tagName.length + 2;
+                    lastTag = { attrs:{} };
+                    charMetrices = "";
+                } else if((inHTMLChar==1 || inHTMLChar==2) && htmlStr[htmlChar]=="/" && htmlStr[parseInt(htmlChar) + 1]==">") {
+                    parsedElements.push(React.createElement(lastTag.tagName, lastTag.attrs, []));
+                    inHTMLChar = 0;
+                    htmlChar += 2;
+                    lastTag = { attrs:{} };
+                } else if(htmlStr.length - 1==parseInt(htmlChar)) {
+                    if(inHTMLChar>0) throw "^Tag hasn't closed, please close specified tag "+lastTag.tagName; else if(charMetrices!="") {
+                        charMetrices += htmlStr[htmlChar];
+                        parsedElements.push(React.createElement(React.Fragment, {}, [charMetrices]));
+                    }
+                } else charMetrices += htmlStr[htmlChar];
+            } catch(PartialParseError) {
+                console.error(PartialParseError, htmlChar);
+            }
+        }
+        return parsedElements.length>1 ? parsedElements : parsedElements[0];
+    } catch(ParseError) {
+        console.error(ParseError);
+        return React.createElement(React.Fragment, {}, ["[Object error]"])
+    }
+}
+
+export function parseHTMLReactComponent(htmlStr, allowedTags=[]) {
+    try {
+        let parsedElements = [], charMetrices = "", inHTMLChar = 0, lastTag = { attrs:{} }, inAttr = false;
+        for(let htmlChar=0;htmlChar<htmlStr.length;htmlChar++) {
+            try {
+                if(inHTMLChar<=0 && htmlStr[htmlChar]=="<" && htmlStr[parseInt(htmlChar + 1)].trim()!="") {
+                    if(charMetrices!="") parsedElements.push(React.createElement(React.Fragment, {}, [charMetrices]));
+                    charMetrices = "";
+                    inHTMLChar = 1;
+                } else if(inHTMLChar==2 && (htmlStr[parseInt(htmlChar)].trim()=="" || htmlStr[htmlChar]==">" || (htmlStr[htmlChar]=="/" && htmlStr[parseInt(htmlChar) + 1]==">")) && htmlStr[parseInt(htmlChar) - 1].trim()!="") {
+                    if(inAttr && htmlStr[htmlChar - 1]=='"') {
+                        let attrName, attrVal;
+                        attrName = charMetrices.split("=");
+                        attrVal = attrName[1]; //attrName[1].substring(1, attrName[1].length - 1);
+                        attrName = attrName[0];
+                        if(attrName=="style") {
+                            let entries = attrVal.split(";"), tempProps = {}, params = [];
+                            for(let entry in entries) {
+                                params = entries[entry].split(":");
+                                while(params[0].indexOf("-")>-1) { if(true || params[0].indexOf("-")>0) { params[0] = params[0].split(""); params[0][params[0].indexOf("-") + 1] = params[0][params[0].indexOf("-") + 1].toUpperCase(); params[0] = params[0].join(""); } params[0] = params[0].replace("-", ""); }
+                                tempProps[params[0]] = params[1];
+                            }
+                            attrVal = tempProps;
+                        }
+                        lastTag.attrs[attrName] = attrVal;
+                        charMetrices = "";
+                        inAttr = false;
+                    } else if(!inAttr) {
+                        lastTag.attrs[charMetrices] = true;
+                        charMetrices = "";
+                    }
+                    if(htmlStr[htmlChar]==">") inHTMLChar = 3;
+                    else if(htmlStr[htmlChar]=="/") {
+                        parsedElements.push(React.createElement(lastTag.tagName, lastTag.attrs, []));
+                        inHTMLChar = 0;
+                        htmlChar += 2;
+                        lastTag = { attrs:{} };
+                    }
+                } else if(!inAttr && inHTMLChar==2 && htmlStr[htmlChar]=='"') {
+                    if(htmlStr[htmlChar - 1]=="=") inAttr = 1; else throw "Attribute hasn't equaled";
+                } else if(inHTMLChar==2 && htmlStr[htmlChar]==">") {
+                    if(inAttr%2!==0) throw "^Attribute hasn't closed in tag "+lastTag.tagName;
+                    inHTMLChar = 3;
+                } else if(inHTMLChar==1 && (htmlStr[parseInt(htmlChar)].trim()=="" || htmlStr[htmlChar]==">")) {
+                    if(htmlStr[htmlChar]==">") inHTMLChar = 3; else inHTMLChar = 2;
+                    lastTag.tagName = charMetrices;
+                    charMetrices = "";
+                } else if(inHTMLChar==3 && htmlStr[htmlChar]=="<" && htmlStr[parseInt(htmlChar) + 1]=="/" && htmlStr.substr(htmlChar, lastTag.tagName.length + 3)==="</"+lastTag.tagName+">") {
+                    lastTag.children = [];
+                    lastTag.textContent = charMetrices;
+                    if(charMetrices!="") lastTag.children = parseHTMLReactComponent(lastTag.textContent);
+                    parsedElements.push(React.createElement(lastTag.tagName, lastTag.attrs, Array.isArray(lastTag.children) ? lastTag.children : [lastTag.children]));
+                    inHTMLChar = 0;
+                    htmlChar += lastTag.tagName.length + 2;
+                    lastTag = { attrs:{} };
+                    charMetrices = "";
+                } else if((inHTMLChar==1 || inHTMLChar==2) && htmlStr[htmlChar]=="/" && htmlStr[parseInt(htmlChar) + 1]==">") {
+                    parsedElements.push(React.createElement(lastTag.tagName, lastTag.attrs, []));
+                    inHTMLChar = 0;
+                    htmlChar += 2;
+                    lastTag = { attrs:{} };
+                } else if(htmlStr.length - 1==parseInt(htmlChar)) {
+                    if(inHTMLChar>0) throw "^Tag hasn't closed, please close specified tag "+lastTag.tagName; else if(charMetrices!="") {
+                        charMetrices += htmlStr[htmlChar];
+                        parsedElements.push(React.createElement(React.Fragment, {}, [charMetrices]));
+                    }
+                } else charMetrices += htmlStr[htmlChar];
+            } catch(PartialParseError) {
+                console.error(PartialParseError, htmlChar);
+            }
+        }
+        return parsedElements.length>1 ? parsedElements : parsedElements[0];
+    } catch(ParseError) {
+        console.error(ParseError);
+        return React.createElement(React.Fragment, {}, ["[Object error]"])
+    }
+}
+
+export function parseHTMLReactComponent(htmlStr, allowedTags=[]) {
+    try {
+        let parsedElements = [], charMetrices = "", inHTMLChar = 0, lastTag = { attrs:{} }, inAttr = false, afterAttr = false;
+        for(let htmlChar=0;htmlChar<htmlStr.length;htmlChar++) {
+            try {
+                if(inHTMLChar<=0 && htmlStr[htmlChar]=="<" && htmlStr[parseInt(htmlChar + 1)].trim()!="") {
+                    if(charMetrices!="") parsedElements.push(React.createElement(React.Fragment, {}, [charMetrices]));
+                    charMetrices = "";
+                    inHTMLChar = 1;
+                } else if(inHTMLChar==2 && inAttr && htmlStr[htmlChar]=='"') {
+                    charMetrices = charMetrices.trimStart().trimLeft();
+                    let attrName, attrVal;
+                        attrName = charMetrices.split("=");
+                        attrVal = attrName[1]; //attrName[1].substring(1, attrName[1].length - 1);
+                        attrName = attrName[0];
+                        if(attrName=="style") {
+                            let entries = attrVal.split(";"), tempProps = {}, params = [];
+                            for(let entry in entries) {
+                                params = entries[entry].split(":");
+                                while(params[0].indexOf("-")>-1) { if(true || params[0].indexOf("-")>0) { params[0] = params[0].split(""); params[0][params[0].indexOf("-") + 1] = params[0][params[0].indexOf("-") + 1].toUpperCase(); params[0] = params[0].join(""); } params[0] = params[0].replace("-", ""); }
+                                tempProps[params[0]] = params[1];
+                            }
+                            attrVal = tempProps;
+                        }
+                        lastTag.attrs[attrName] = attrVal;
+                        charMetrices = "";
+                        inAttr = false;
+                        if(htmlStr[htmlChar]==">") inHTMLChar = 3;
+                        else if(htmlStr[htmlChar]=="/") {
+                            parsedElements.push(React.createElement(lastTag.tagName, lastTag.attrs, []));
+                            inHTMLChar = 0;
+                            htmlChar += 2;
+                            lastTag = { attrs:{} };
+                        }
+                } else if(charMetrices.trim()!="" && !inAttr && inHTMLChar==2 && (htmlStr[parseInt(htmlChar)].trim()=="" || htmlStr[htmlChar]==">" || (htmlStr[htmlChar]=="/" && htmlStr[parseInt(htmlChar) + 1]==">")) && htmlStr[parseInt(htmlChar) - 1].trim()!="") {
+                    charMetrices = charMetrices.trim();
+                    lastTag.attrs[charMetrices] = true;
+                    charMetrices = "";
+                    if(htmlStr[htmlChar]==">") inHTMLChar = 3;
+                    else if(htmlStr[htmlChar]=="/") {
+                        parsedElements.push(React.createElement(lastTag.tagName, lastTag.attrs, []));
+                        inHTMLChar = 0;
+                        htmlChar += 2;
+                        lastTag = { attrs:{} };
+                    }
+                } else if(!inAttr && inHTMLChar==2 && htmlStr[htmlChar]=='"') {
+                    if(htmlStr[htmlChar - 1]=="=") inAttr = 1; else throw "^Attribute hasn't equaled or enclosed "+charMetrices;
+                } else if(inHTMLChar==2 && htmlStr[htmlChar]==">") {
+                    if(inAttr) throw "^Attribute hasn't closed in tag "+lastTag.tagName;
+                    inHTMLChar = 3;
+                } else if(inHTMLChar==1 && (htmlStr[parseInt(htmlChar)].trim()=="" || htmlStr[htmlChar]==">")) {
+                    if(htmlStr[htmlChar]==">") inHTMLChar = 3; else inHTMLChar = 2;
+                    lastTag.tagName = charMetrices;
+                    charMetrices = "";
+                } else if(inHTMLChar==3 && htmlStr[htmlChar]=="<" && htmlStr[parseInt(htmlChar) + 1]=="/" && htmlStr.substr(htmlChar, lastTag.tagName.length + 3)==="</"+lastTag.tagName+">") {
+                    lastTag.children = [];
+                    lastTag.textContent = charMetrices;
+                    if(charMetrices!="") lastTag.children = parseHTMLReactComponent(lastTag.textContent);
+                    parsedElements.push(React.createElement(lastTag.tagName, lastTag.attrs, Array.isArray(lastTag.children) ? lastTag.children : [lastTag.children]));
+                    inHTMLChar = 0;
+                    htmlChar += lastTag.tagName.length + 2;
+                    lastTag = { attrs:{} };
+                    charMetrices = "";
+                } else if((inHTMLChar==1 || inHTMLChar==2) && htmlStr[htmlChar]=="/" && htmlStr[parseInt(htmlChar) + 1]==">") {
+                    parsedElements.push(React.createElement(lastTag.tagName, lastTag.attrs, []));
+                    inHTMLChar = 0;
+                    htmlChar += 2;
+                    lastTag = { attrs:{} };
+                } else if(htmlStr.length - 1==parseInt(htmlChar)) {
+                    if(inHTMLChar>0) throw "^Tag hasn't closed, please close specified tag "+lastTag.tagName; else if(charMetrices!="") {
+                        charMetrices += htmlStr[htmlChar];
+                        parsedElements.push(React.createElement(React.Fragment, {}, [charMetrices]));
+                    }
+                } else charMetrices += htmlStr[htmlChar];
+            } catch(PartialParseError) {
+                if(PartialParseError.indexOf("^")==0) throw PartialParseError;
+                console.error(PartialParseError, htmlChar);
+            }
+        }
+        return parsedElements.length>1 ? parsedElements : parsedElements[0];
+    } catch(ParseError) {
+        if(ParseError.indexOf("^")==0) ParseError = ParseError.replace("^", "");
+        console.error(ParseError);
+        return React.createElement(React.Fragment, {}, ["[Object error]"])
+    }
+}
+
+export function parseHTMLReactComponent(htmlStr, allowedTags=[]) {
+    try {
+        let parsedElements = [], charMetrices = "", inHTMLChar = 0, lastTag = { attrs:{} }, inAttr = false;
+        for(let htmlChar=0;htmlChar<htmlStr.length;htmlChar++) {
+            try {
+                if(inHTMLChar<=0 && htmlStr[htmlChar]=="<" && htmlStr[parseInt(htmlChar + 1)].trim()!="") {
+                    if(charMetrices!="") parsedElements.push(React.createElement(React.Fragment, {}, [charMetrices]));
+                    charMetrices = "";
+                    inHTMLChar = 1;
+                } else if(inHTMLChar==2 && inAttr && htmlStr[htmlChar]=='"') {
+                    charMetrices = charMetrices.trimStart().trimLeft();
+                    let attrName, attrVal;
+                        attrName = charMetrices.split("=");
+                        attrVal = attrName[1]; //attrName[1].substring(1, attrName[1].length - 1);
+                        attrName = attrName[0];
+                        if(attrName=="style") {
+                            let entries = attrVal.split(";"), tempProps = {}, params = [];
+                            for(let entry in entries) {
+                                params = entries[entry].split(":");
+                                while(params[0].indexOf("-")>-1) { if(true || params[0].indexOf("-")>0) { params[0] = params[0].split(""); params[0][params[0].indexOf("-") + 1] = params[0][params[0].indexOf("-") + 1].toUpperCase(); params[0] = params[0].join(""); } params[0] = params[0].replace("-", ""); }
+                                tempProps[params[0]] = params[1];
+                            }
+                            attrVal = tempProps;
+                        }
+                        lastTag.attrs[attrName] = attrVal;
+                        charMetrices = "";
+                        inAttr = false;
+                        if(htmlStr[htmlChar]==">") inHTMLChar = 3;
+                        else if(htmlStr[htmlChar]=="/") {
+                            parsedElements.push(React.createElement(lastTag.tagName, lastTag.attrs, []));
+                            inHTMLChar = 0;
+                            htmlChar += 2;
+                            lastTag = { attrs:{} };
+                        }
+                } else if(charMetrices.trim()!="" && !inAttr && inHTMLChar==2 && (htmlStr[parseInt(htmlChar)].trim()=="" || htmlStr[htmlChar]==">" || (htmlStr[htmlChar]=="/" && htmlStr[parseInt(htmlChar) + 1]==">")) && htmlStr[parseInt(htmlChar) - 1].trim()!="") {
+                    charMetrices = charMetrices.trim();
+                    lastTag.attrs[charMetrices] = true;
+                    charMetrices = "";
+                    if(htmlStr[htmlChar]==">") inHTMLChar = 3;
+                    else if(htmlStr[htmlChar]=="/") {
+                        parsedElements.push(React.createElement(lastTag.tagName, lastTag.attrs, []));
+                        inHTMLChar = 0;
+                        htmlChar += 2;
+                        lastTag = { attrs:{} };
+                    }
+                } else if(!inAttr && inHTMLChar==2 && htmlStr[htmlChar]=='"') {
+                    if(htmlStr[htmlChar - 1]=="=") inAttr = true; else throw "^Attribute hasn't equaled or enclosed "+charMetrices;
+                } else if(inHTMLChar==2 && htmlStr[htmlChar]==">") {
+                    inHTMLChar = 3;
+                } else if(inHTMLChar==1 && (htmlStr[parseInt(htmlChar)].trim()=="" || htmlStr[htmlChar]==">")) {
+                    if(htmlStr[htmlChar]==">") inHTMLChar = 3; else inHTMLChar = 2;
+                    lastTag.tagName = charMetrices;
+                    charMetrices = "";
+                } else if(inHTMLChar==3 && htmlStr[htmlChar]=="<" && htmlStr[parseInt(htmlChar) + 1]=="/" && htmlStr.substr(htmlChar, lastTag.tagName.length + 3)==="</"+lastTag.tagName+">") {
+                    lastTag.children = [];
+                    lastTag.textContent = charMetrices;
+                    if(charMetrices!="") lastTag.children = parseHTMLReactComponent(lastTag.textContent);
+                    parsedElements.push(React.createElement(lastTag.tagName, lastTag.attrs, Array.isArray(lastTag.children) ? lastTag.children : [lastTag.children]));
+                    inHTMLChar = 0;
+                    htmlChar += lastTag.tagName.length + 2;
+                    lastTag = { attrs:{} };
+                    charMetrices = "";
+                } else if((inHTMLChar==1 || inHTMLChar==2) && htmlStr[htmlChar]=="/" && htmlStr[parseInt(htmlChar) + 1]==">") {
+                    parsedElements.push(React.createElement(lastTag.tagName, lastTag.attrs, []));
+                    inHTMLChar = 0;
+                    htmlChar += 2;
+                    lastTag = { attrs:{} };
+                } else if(htmlStr.length - 1==parseInt(htmlChar)) {
+                    if(inHTMLChar>0) throw "^Tag hasn't closed, please close specified tag "+lastTag.tagName; else if(charMetrices!="") {
+                        charMetrices += htmlStr[htmlChar];
+                        parsedElements.push(React.createElement(React.Fragment, {}, [charMetrices]));
+                    }
+                } else charMetrices += htmlStr[htmlChar];
+            } catch(PartialParseError) {
+                if(PartialParseError.indexOf("^")==0) throw PartialParseError;
+                console.error(PartialParseError, htmlChar);
+            }
+        }
+        return parsedElements.length>1 ? parsedElements : parsedElements[0];
+    } catch(ParseError) {
+        if(ParseError.indexOf("^")==0) ParseError = ParseError.replace("^", "");
+        console.error(ParseError);
+        return React.createElement(React.Fragment, {}, ["[Object error]"])
+    }
+}
+
+export function parseHTMLReactComponent(htmlStr, allowedTags=[], allowed=true) {
+    try {
+        let parsedElements = [], charMetrices = "", inHTMLChar = 0, lastTag = { attrs:{} }, inAttr = false;
+        if(allowedTags.length>0) var completeTags = "";
+        for(let htmlChar=0;htmlChar<htmlStr.length;htmlChar++) {
+            try {
+                if(allowedTags.length>0 && inHTMLChar>0) completeTags += htmlStr[htmlChar];
+                if(inHTMLChar<=0 && htmlStr[htmlChar]=="<" && htmlStr[parseInt(htmlChar + 1)].trim()!="") {
+                    if(charMetrices!="") parsedElements.push(React.createElement(React.Fragment, {}, [charMetrices]));
+                    charMetrices = "";
+                    inHTMLChar = 1;
+                } else if(inHTMLChar==2 && inAttr && htmlStr[htmlChar]=='"') {
+                    charMetrices = charMetrices.trimStart().trimLeft();
+                    let attrName, attrVal;
+                        attrName = charMetrices.split("=");
+                        attrVal = attrName[1]; //attrName[1].substring(1, attrName[1].length - 1);
+                        attrName = attrName[0];
+                        if(attrName=="style") {
+                            let entries = attrVal.split(";"), tempProps = {}, params = [];
+                            for(let entry in entries) {
+                                params = entries[entry].split(":");
+                                while(params[0].indexOf("-")>-1) { if(true || params[0].indexOf("-")>0) { params[0] = params[0].split(""); params[0][params[0].indexOf("-") + 1] = params[0][params[0].indexOf("-") + 1].toUpperCase(); params[0] = params[0].join(""); } params[0] = params[0].replace("-", ""); }
+                                tempProps[params[0]] = params[1];
+                            }
+                            attrVal = tempProps;
+                        }
+                        lastTag.attrs[attrName] = attrVal;
+                        charMetrices = "";
+                        inAttr = false;
+                        if(htmlStr[htmlChar]==">") inHTMLChar = 3;
+                        else if(htmlStr[htmlChar]=="/") {
+                            parsedElements.push(React.createElement(lastTag.tagName, lastTag.attrs, []));
+                            inHTMLChar = 0;
+                            htmlChar += 2;
+                            lastTag = { attrs:{} };
+                        }
+                } else if(charMetrices.trim()!="" && !inAttr && inHTMLChar==2 && (htmlStr[parseInt(htmlChar)].trim()=="" || htmlStr[htmlChar]==">" || (htmlStr[htmlChar]=="/" && htmlStr[parseInt(htmlChar) + 1]==">")) && htmlStr[parseInt(htmlChar) - 1].trim()!="") {
+                    charMetrices = charMetrices.trim();
+                    lastTag.attrs[charMetrices] = true;
+                    charMetrices = "";
+                    if(htmlStr[htmlChar]==">") inHTMLChar = 3;
+                    else if(htmlStr[htmlChar]=="/") {
+                        parsedElements.push(React.createElement(lastTag.tagName, lastTag.attrs, []));
+                        inHTMLChar = 0;
+                        htmlChar += 2;
+                        lastTag = { attrs:{} };
+                    }
+                } else if(!inAttr && inHTMLChar==2 && htmlStr[htmlChar]=='"') {
+                    if(htmlStr[htmlChar - 1]=="=") inAttr = true; else throw "^Attribute hasn't equaled or enclosed "+charMetrices;
+                } else if(inHTMLChar==2 && htmlStr[htmlChar]==">") {
+                    inHTMLChar = 3;
+                } else if(inHTMLChar==1 && (htmlStr[parseInt(htmlChar)].trim()=="" || htmlStr[htmlChar]==">")) {
+                    if(htmlStr[htmlChar]==">") inHTMLChar = 3; else inHTMLChar = 2;
+                    lastTag.tagName = charMetrices;
+                    charMetrices = "";
+                } else if(inHTMLChar==3 && htmlStr[htmlChar]=="<" && htmlStr[parseInt(htmlChar) + 1]=="/" && htmlStr.substr(htmlChar, lastTag.tagName.length + 3)==="</"+lastTag.tagName+">") {
+                    lastTag.children = [];
+                    lastTag.textContent = charMetrices;
+                    if((allowed && (allowedTags.length<=0 || allowedTags.includes(lastTag.tagName))) || (!allowed && (allowedTags.length<=0 || !allowedTags.includes(lastTag.tagName)))) {
+                        if(charMetrices!="") lastTag.children = parseHTMLReactComponent(lastTag.textContent);
+                        parsedElements.push(React.createElement(lastTag.tagName, lastTag.attrs, Array.isArray(lastTag.children) ? lastTag.children : [lastTag.children]));
+                    } else if((!allowed && (allowedTags.length<=0 || allowedTags.includes(lastTag.tagName))) || allowed) {
+                        /*let attrsNames = Object.keys(lastTag.attrs), attrsValues = Object.values(lastTag.attrs), attrsArr = new Array(attrsNames.length).fill("").map((val, ind)=>attrsNames[ind]+'="'+attrsValues[ind]+'" ');
+                        parsedElements.push(React.createElement(React.Fragment, {}, ["<"+lastTag.tagName+" "+attrsArr.join(" ")+'>'+lastTag.textContent+'</'+lastTag.tagName+'>']));*/
+                        parsedElements.push(React.createElement(React.Fragment, {}, ["<"+completeTags+"/"+lastTag.tagName+">"]));
+                    }
+                    inHTMLChar = 0;
+                    htmlChar += lastTag.tagName.length + 2;
+                    lastTag = { attrs:{} };
+                    charMetrices = "";
+                    if(allowedTags.length>0) completeTags = "";
+                } else if((inHTMLChar==1 || inHTMLChar==2) && htmlStr[htmlChar]=="/" && htmlStr[parseInt(htmlChar) + 1]==">") {
+                    if((allowed && (allowedTags.length<=0 || allowedTags.includes(lastTag.tagName))) || (!allowed && (allowedTags.length<=0 || !allowedTags.includes(lastTag.tagName)))) {
+                        parsedElements.push(React.createElement(lastTag.tagName, lastTag.attrs, []));
+                    } else if((!allowed && (allowedTags.length<=0 || allowedTags.includes(lastTag.tagName))) || allowed) {
+                        /*let attrsNames = Object.keys(lastTag.attrs), attrsValues = Object.values(lastTag.attrs), attrsArr = new Array(attrsNames.length).fill("").map((val, ind)=>attrsNames[ind]+'="'+attrsValues[ind]+'"');
+                        parsedElements.push(React.createElement(React.Fragment, {}, ["<"+lastTag.tagName+attrsNames.join(" ")+'/>']));*/
+                        parsedElements.push(React.createElement(React.Fragment, {}, ["<"+completeTags+">"]));
+                    }
+                    inHTMLChar = 0;
+                    htmlChar += 2;
+                    lastTag = { attrs:{} };
+                } else if(htmlStr.length - 1==parseInt(htmlChar)) {
+                    if(inHTMLChar>0) throw "^Tag hasn't closed, please close specified tag "+lastTag.tagName; else if(charMetrices!="") {
+                        charMetrices += htmlStr[htmlChar];
+                        parsedElements.push(React.createElement(React.Fragment, {}, [charMetrices]));
+                    }
+                } else charMetrices += htmlStr[htmlChar];
+            } catch(PartialParseError) {
+                if(PartialParseError.indexOf("^")==0) throw PartialParseError;
+                console.error(PartialParseError, htmlChar);
+            }
+        }
+        return parsedElements.length>1 ? parsedElements : parsedElements[0];
+    } catch(ParseError) {
+        if(ParseError.indexOf("^")==0) ParseError = ParseError.replace("^", "");
+        console.error(ParseError);
+        return React.createElement(React.Fragment, {}, ["[Object error]"])
+    }
+}
+
+export function parseHTMLReactComponent(htmlStr, allowedTags=[]) {
+    try {
+        let parsedElements = [], charMetrices = "", inHTMLChar = 0, lastTag = { attrs:{} }, inAttr = false;
+        for(let htmlChar=0;htmlChar<htmlStr.length;htmlChar++) {
+            try {
+                if(inHTMLChar<=0 && htmlStr[htmlChar]=="<" && htmlStr[parseInt(htmlChar + 1)].trim()!="") {
+                    if(charMetrices!="") parsedElements.push(React.createElement(React.Fragment, {}, [charMetrices]));
+                    charMetrices = "";
+                    inHTMLChar = 1;
+                } else if(inHTMLChar==2 && inAttr && htmlStr[htmlChar]=='"') {
+                    charMetrices = charMetrices.trimStart().trimLeft();
+                    let attrName, attrVal;
+                        attrName = charMetrices.split("=");
+                        attrVal = attrName[1];
+                        attrName = attrName[0];
+                        if(attrName=="style") {
+                            let entries = attrVal.split(";"), tempProps = {}, params = [];
+                            for(let entry in entries) {
+                                params = entries[entry].split(":");
+                                while(params[0].indexOf("-")>-1) { if(true || params[0].indexOf("-")>0) { params[0] = params[0].split(""); params[0][params[0].indexOf("-") + 1] = params[0][params[0].indexOf("-") + 1].toUpperCase(); params[0] = params[0].join(""); } params[0] = params[0].replace("-", ""); }
+                                tempProps[params[0]] = params[1];
+                            }
+                            attrVal = tempProps;
+                        }
+                        lastTag.attrs[attrName] = attrVal;
+                        charMetrices = "";
+                        inAttr = false;
+                        if(htmlStr[htmlChar]==">") inHTMLChar = 3;
+                        else if(htmlStr[htmlChar]=="/") {
+                            parsedElements.push(React.createElement(lastTag.tagName, lastTag.attrs, []));
+                            inHTMLChar = 0;
+                            htmlChar += 2;
+                            lastTag = { attrs:{} };
+                        }
+                } else if(charMetrices.trim()!="" && !inAttr && inHTMLChar==2 && (htmlStr[parseInt(htmlChar)].trim()=="" || htmlStr[htmlChar]==">" || (htmlStr[htmlChar]=="/" && htmlStr[parseInt(htmlChar) + 1]==">")) && htmlStr[parseInt(htmlChar) - 1].trim()!="") {
+                    charMetrices = charMetrices.trim();
+                    lastTag.attrs[charMetrices] = true;
+                    charMetrices = "";
+                    if(htmlStr[htmlChar]==">") inHTMLChar = 3;
+                    else if(htmlStr[htmlChar]=="/") {
+                        parsedElements.push(React.createElement(lastTag.tagName, lastTag.attrs, []));
+                        inHTMLChar = 0;
+                        htmlChar += 2;
+                        lastTag = { attrs:{} };
+                    }
+                } else if(!inAttr && inHTMLChar==2 && htmlStr[htmlChar]=='"') {
+                    if(htmlStr[htmlChar - 1]=="=") inAttr = true; else throw "^Attribute hasn't equaled or enclosed "+charMetrices;
+                } else if(inHTMLChar==2 && htmlStr[htmlChar]==">") {
+                    inHTMLChar = 3;
+                } else if(inHTMLChar==1 && (htmlStr[parseInt(htmlChar)].trim()=="" || htmlStr[htmlChar]==">")) {
+                    if(htmlStr[htmlChar]==">") inHTMLChar = 3; else inHTMLChar = 2;
+                    lastTag.tagName = charMetrices;
+                    charMetrices = "";
+                } else if(inHTMLChar==3 && htmlStr[htmlChar]=="<" && htmlStr[parseInt(htmlChar) + 1]=="/" && htmlStr.substr(htmlChar, lastTag.tagName.length + 3)==="</"+lastTag.tagName+">") {
+                    lastTag.children = [];
+                    lastTag.textContent = charMetrices;
+                    if(charMetrices!="") lastTag.children = parseHTMLReactComponent(lastTag.textContent);
+                    parsedElements.push(React.createElement(lastTag.tagName, lastTag.attrs, Array.isArray(lastTag.children) ? lastTag.children : [lastTag.children]));
+                    inHTMLChar = 0;
+                    htmlChar += lastTag.tagName.length + 2;
+                    lastTag = { attrs:{} };
+                    charMetrices = "";
+                } else if((inHTMLChar==1 || inHTMLChar==2) && htmlStr[htmlChar]=="/" && htmlStr[parseInt(htmlChar) + 1]==">") {
+                    parsedElements.push(React.createElement(lastTag.tagName, lastTag.attrs, []));
+                    inHTMLChar = 0;
+                    htmlChar += 2;
+                    lastTag = { attrs:{} };
+                } else if(htmlStr.length - 1==parseInt(htmlChar)) {
+                    if(inHTMLChar>0) throw "^Tag hasn't closed, please close specified tag "+lastTag.tagName; else if(charMetrices!="") {
+                        charMetrices += htmlStr[htmlChar];
+                        parsedElements.push(React.createElement(React.Fragment, {}, [charMetrices]));
+                    }
+                } else charMetrices += htmlStr[htmlChar];
+            } catch(PartialParseError) {
+                if(PartialParseError.indexOf("^")==0) throw PartialParseError;
+                console.error(PartialParseError, htmlChar);
+            }
+        }
+        return parsedElements.length>1 ? parsedElements : parsedElements[0];
+    } catch(ParseError) {
+        if(ParseError.indexOf("^")==0) ParseError = ParseError.replace("^", "");
+        console.error(ParseError);
+        return React.createElement(React.Fragment, {}, ["[Object error]"])
+    }
+}
+
+export function parseHTMLReactComponent(htmlStr, allowedTags=[], allowed=true) {
+    try {
+        let parsedElements = [], charMetrices = "", inHTMLChar = 0, lastTag = { attrs:{} }, inAttr = false;
+        if(allowedTags.length>0) var completeTags = "";
+        for(let htmlChar=0;htmlChar<htmlStr.length;htmlChar++) {
+            try {
+                if(allowedTags.length>0 && inHTMLChar>0) completeTags += htmlStr[htmlChar];
+                if(inHTMLChar<=0 && htmlStr[htmlChar]=="<" && htmlStr[parseInt(htmlChar + 1)].trim()!="") {
+                    if(charMetrices!="") parsedElements.push(React.createElement(React.Fragment, {}, [charMetrices]));
+                    charMetrices = "";
+                    inHTMLChar = 1;
+                } else if(inHTMLChar==2 && inAttr && htmlStr[htmlChar]=='"') {
+                    charMetrices = charMetrices.trimStart().trimLeft();
+                    let attrName, attrVal;
+                        attrName = charMetrices.split("=");
+                        attrVal = attrName[1]; //attrName[1].substring(1, attrName[1].length - 1);
+                        attrName = attrName[0];
+                        if(attrName=="style") {
+                            let entries = attrVal.split(";"), tempProps = {}, params = [];
+                            for(let entry in entries) {
+                                params = entries[entry].split(":");
+                                while(params[0].indexOf("-")>-1) { if(true || params[0].indexOf("-")>0) { params[0] = params[0].split(""); params[0][params[0].indexOf("-") + 1] = params[0][params[0].indexOf("-") + 1].toUpperCase(); params[0] = params[0].join(""); } params[0] = params[0].replace("-", ""); }
+                                tempProps[params[0]] = params[1];
+                            }
+                            attrVal = tempProps;
+                        }
+                        lastTag.attrs[attrName] = attrVal;
+                        charMetrices = "";
+                        inAttr = false;
+                        if(htmlStr[htmlChar]==">") inHTMLChar = 3;
+                        else if(htmlStr[htmlChar]=="/") {
+                            parsedElements.push(React.createElement(lastTag.tagName, lastTag.attrs, []));
+                            inHTMLChar = 0;
+                            htmlChar += 2;
+                            lastTag = { attrs:{} };
+                        }
+                } else if(charMetrices.trim()!="" && !inAttr && inHTMLChar==2 && (htmlStr[parseInt(htmlChar)].trim()=="" || htmlStr[htmlChar]==">" || (htmlStr[htmlChar]=="/" && htmlStr[parseInt(htmlChar) + 1]==">")) && htmlStr[parseInt(htmlChar) - 1].trim()!="") {
+                    charMetrices = charMetrices.trim();
+                    lastTag.attrs[charMetrices] = true;
+                    charMetrices = "";
+                    if(htmlStr[htmlChar]==">") inHTMLChar = 3;
+                    else if(htmlStr[htmlChar]=="/") {
+                        parsedElements.push(React.createElement(lastTag.tagName, lastTag.attrs, []));
+                        inHTMLChar = 0;
+                        htmlChar += 2;
+                        lastTag = { attrs:{} };
+                    }
+                } else if(!inAttr && inHTMLChar==2 && htmlStr[htmlChar]=='"') {
+                    if(htmlStr[htmlChar - 1]=="=") inAttr = true; else throw "^Attribute hasn't equaled or enclosed "+charMetrices;
+                } else if(inHTMLChar==2 && htmlStr[htmlChar]==">") {
+                    inHTMLChar = 3;
+                } else if(inHTMLChar==1 && (htmlStr[parseInt(htmlChar)].trim()=="" || htmlStr[htmlChar]==">")) {
+                    if(htmlStr[htmlChar]==">") inHTMLChar = 3; else inHTMLChar = 2;
+                    lastTag.tagName = charMetrices;
+                    charMetrices = "";
+                } else if(inHTMLChar==3 && htmlStr[htmlChar]=="<" && htmlStr[parseInt(htmlChar) + 1]=="/" && htmlStr.substr(htmlChar, lastTag.tagName.length + 3)==="</"+lastTag.tagName+">") {
+                    lastTag.children = [];
+                    lastTag.textContent = charMetrices;
+                    if((allowed && (allowedTags.length<=0 || allowedTags.includes(lastTag.tagName))) || (!allowed && (allowedTags.length<=0 || !allowedTags.includes(lastTag.tagName)))) {
+                        if(charMetrices!="") lastTag.children = parseHTMLReactComponent(lastTag.textContent);
+                        parsedElements.push(React.createElement(lastTag.tagName, lastTag.attrs, Array.isArray(lastTag.children) ? lastTag.children : [lastTag.children]));
+                    } else if((!allowed && (allowedTags.length<=0 || allowedTags.includes(lastTag.tagName))) || allowed) {
+                        parsedElements.push(React.createElement(React.Fragment, {}, ["<"+completeTags+"/"+lastTag.tagName+">"]));
+                    }
+                    inHTMLChar = 0;
+                    htmlChar += lastTag.tagName.length + 2;
+                    lastTag = { attrs:{} };
+                    charMetrices = "";
+                    if(allowedTags.length>0) completeTags = "";
+                } else if((inHTMLChar==1 || inHTMLChar==2) && htmlStr[htmlChar]=="/" && htmlStr[parseInt(htmlChar) + 1]==">") {
+                    if((allowed && (allowedTags.length<=0 || allowedTags.includes(lastTag.tagName))) || (!allowed && (allowedTags.length<=0 || !allowedTags.includes(lastTag.tagName)))) {
+                        parsedElements.push(React.createElement(lastTag.tagName, lastTag.attrs));
+                    } else if((!allowed && (allowedTags.length<=0 || allowedTags.includes(lastTag.tagName))) || allowed) {
+                        parsedElements.push(React.createElement(React.Fragment, {}, ["<"+completeTags+">"]));
+                    }
+                    inHTMLChar = 0;
+                    htmlChar += 2;
+                    lastTag = { attrs:{} };
+                } else if(htmlStr.length - 1==parseInt(htmlChar)) {
+                    if(inHTMLChar>0) throw "^Tag hasn't closed, please close specified tag "+lastTag.tagName; else if(charMetrices!="") {
+                        charMetrices += htmlStr[htmlChar];
+                        parsedElements.push(React.createElement(React.Fragment, {}, [charMetrices]));
+                    }
+                } else charMetrices += htmlStr[htmlChar];
+            } catch(PartialParseError) {
+                if(PartialParseError.indexOf("^")==0) throw PartialParseError;
+                console.error(PartialParseError, htmlChar);
+            }
+        }
+        return parsedElements.length>1 ? parsedElements : parsedElements[0];
+    } catch(ParseError) {
+        if(ParseError.indexOf("^")==0) ParseError = ParseError.replace("^", "");
+        console.error(ParseError);
+        return React.createElement(React.Fragment, {}, ["[Object error]"])
+    }
+}
+
+export function parseHTMLReactComponent(htmlStr, allowedTags=[], allowed=true) {
+    try {
+        let parsedElements = [], charMetrices = "", inHTMLChar = 0, lastTag = { attrs:{} }, inAttr = false;
+        if(allowedTags.length>0) var completeTags = "";
+        for(let htmlChar=0;htmlChar<htmlStr.length;htmlChar++) {
+            try {
+                if(allowedTags.length>0 && inHTMLChar>0) completeTags += htmlStr[htmlChar];
+                if(inHTMLChar<=0 && htmlStr[htmlChar]=="<" && htmlStr[parseInt(htmlChar + 1)].trim()!="") {
+                    if(charMetrices!="") parsedElements.push(React.createElement(React.Fragment, {}, [charMetrices]));
+                    charMetrices = "";
+                    inHTMLChar = 1;
+                } else if(inHTMLChar==2 && inAttr && htmlStr[htmlChar]=='"') {
+                    charMetrices = charMetrices.trimStart().trimLeft();
+                    let attrName, attrVal;
+                        attrName = charMetrices.split("=");
+                        attrVal = attrName[1]; //attrName[1].substring(1, attrName[1].length - 1);
+                        attrName = attrName[0];
+                        if(attrName=="style") {
+                            let entries = attrVal.split(";"), tempProps = {}, params = [];
+                            for(let entry in entries) {
+                                params = entries[entry].split(":");
+                                while(params[0].indexOf("-")>-1) { if(true || params[0].indexOf("-")>0) { params[0] = params[0].split(""); params[0][params[0].indexOf("-") + 1] = params[0][params[0].indexOf("-") + 1].toUpperCase(); params[0] = params[0].join(""); } params[0] = params[0].replace("-", ""); }
+                                tempProps[params[0]] = params[1];
+                            }
+                            attrVal = tempProps;
+                        }
+                        lastTag.attrs[attrName] = attrVal;
+                        charMetrices = "";
+                        inAttr = false;
+                        if(htmlStr[htmlChar]==">") inHTMLChar = 3;
+                        else if(htmlStr[htmlChar]=="/") {
+                            parsedElements.push(React.createElement(lastTag.tagName, lastTag.attrs, []));
+                            inHTMLChar = 0;
+                            htmlChar += 2;
+                            lastTag = { attrs:{} };
+                        }
+                } else if(charMetrices.trim()!="" && !inAttr && inHTMLChar==2 && (htmlStr[parseInt(htmlChar)].trim()=="" || htmlStr[htmlChar]==">" || (htmlStr[htmlChar]=="/" && htmlStr[parseInt(htmlChar) + 1]==">")) && htmlStr[parseInt(htmlChar) - 1].trim()!="") {
+                    charMetrices = charMetrices.trim();
+                    lastTag.attrs[charMetrices] = true;
+                    charMetrices = "";
+                    if(htmlStr[htmlChar]==">") inHTMLChar = 3;
+                    else if(htmlStr[htmlChar]=="/") {
+                        parsedElements.push(React.createElement(lastTag.tagName, lastTag.attrs, []));
+                        inHTMLChar = 0;
+                        htmlChar += 2;
+                        lastTag = { attrs:{} };
+                    }
+                } else if(!inAttr && inHTMLChar==2 && htmlStr[htmlChar]=='"') {
+                    if(htmlStr[htmlChar - 1]=="=") inAttr = true; else throw "^Attribute hasn't equaled or enclosed "+charMetrices;
+                } else if(inHTMLChar==2 && htmlStr[htmlChar]==">") {
+                    inHTMLChar = 3;
+                } else if(inHTMLChar==1 && (htmlStr[parseInt(htmlChar)].trim()=="" || htmlStr[htmlChar]==">")) {
+                    if(htmlStr[htmlChar]==">") inHTMLChar = 3; else inHTMLChar = 2;
+                    lastTag.tagName = charMetrices;
+                    charMetrices = "";
+                } else if(inHTMLChar==3 && htmlStr[htmlChar]=="<" && htmlStr[parseInt(htmlChar) + 1]=="/" && htmlStr.substr(htmlChar, lastTag.tagName.length + 3)==="</"+lastTag.tagName+">") {
+                    lastTag.children = [];
+                    lastTag.textContent = charMetrices;
+                    if((allowed && (allowedTags.length<=0 || allowedTags.includes(lastTag.tagName))) || (!allowed && (allowedTags.length<=0 || !allowedTags.includes(lastTag.tagName)))) {
+                        if(charMetrices!="") lastTag.children = parseHTMLReactComponent(lastTag.textContent);
+                        parsedElements.push(React.createElement(lastTag.tagName, lastTag.attrs, Array.isArray(lastTag.children) ? lastTag.children : [lastTag.children]));
+                    } else if((!allowed && (allowedTags.length<=0 || allowedTags.includes(lastTag.tagName))) || allowed) {
+                        parsedElements.push(React.createElement(React.Fragment, {}, ["<"+completeTags+"/"+lastTag.tagName+">"]));
+                    }
+                    inHTMLChar = 0;
+                    htmlChar += lastTag.tagName.length + 2;
+                    lastTag = { attrs:{} };
+                    charMetrices = "";
+                    if(allowedTags.length>0) completeTags = "";
+                } else if((inHTMLChar==1 || inHTMLChar==2) && htmlStr[htmlChar]=="/" && htmlStr[parseInt(htmlChar) + 1]==">") {
+                    if((allowed && (allowedTags.length<=0 || allowedTags.includes(lastTag.tagName))) || (!allowed && (allowedTags.length<=0 || !allowedTags.includes(lastTag.tagName)))) {
+                        parsedElements.push(React.createElement(lastTag.tagName, lastTag.attrs));
+                    } else if((!allowed && (allowedTags.length<=0 || allowedTags.includes(lastTag.tagName))) || allowed) {
+                        parsedElements.push(React.createElement(React.Fragment, {}, ["<"+completeTags+">"]));
+                    }
+                    inHTMLChar = 0;
+                    htmlChar += 2;
+                    lastTag = { attrs:{} };
+                } else if(htmlStr.length - 1==parseInt(htmlChar)) {
+                    if(inHTMLChar>0) throw "^Tag hasn't closed, please close specified tag "+lastTag.tagName; else if(charMetrices!="") {
+                        charMetrices += htmlStr[htmlChar];
+                        parsedElements.push(React.createElement(React.Fragment, {}, [charMetrices]));
+                    }
+                } else charMetrices += htmlStr[htmlChar];
+            } catch(PartialParseError) {
+                if(PartialParseError.indexOf("^")==0) throw PartialParseError;
+                console.error(PartialParseError, htmlChar);
+            }
+        }
+        return parsedElements.length>1 ? parsedElements : parsedElements[0];
+    } catch(ParseError) {
+        if(ParseError.indexOf("^")==0) ParseError = ParseError.replace("^", "");
+        console.error(ParseError);
+        return React.createElement(React.Fragment, {}, ["[Object error]"])
+    }
+}
+
+export function parseHTMLComponent(htmlStr, allowedTags=[]) {
+    //inHTMLChar: 0 - nope, 1 - potentially, 2 - parsing attributes, 3 - in tag
+    try {
+        let parsedElements = [], charMetrices = "", inHTMLChar = 0, lastTag = { attrs:{} };
+        for(let htmlChar=0;htmlChar<htmlStr.length;htmlChar++) {
+            try {
+                if(inHTMLChar<=0 && htmlStr[htmlChar]=="<" && htmlStr[parseInt(htmlChar + 1)].trim()!="") {
+                    if(charMetrices!="") parsedElements.push(document.createTextNode(charMetrices));
+                    charMetrices = "";
+                    inHTMLChar = 1;
+                } else if(inHTMLChar==2 && (htmlStr[parseInt(htmlChar)].trim()=="" || htmlStr[htmlChar]==">" || (htmlStr[htmlChar]=="/" && htmlStr[parseInt(htmlChar) + 1]==">")) && htmlStr[parseInt(htmlChar) - 1].trim()!="") {
+                    if(charMetrices.indexOf('"')>0 && charMetrices[charMetrices.indexOf('"') - 1]=="=") {
+                        let attrName, attrVal;
+                        attrName = charMetrices.split("=");
+                        attrVal = attrName[1].substring(1, attrName[1].length - 2);
+                        attrName = attrName[0];
+                        lastTag.attrs[attrName] = attrVal;
+                        charMetrices = "";
+                    } else {
+                        lastTag.attrs[charMetrices] = true;
+                        charMetrices = "";
+                    }
+                    if(htmlStr[htmlChar]==">") inHTMLChar = 3;
+                    else if(htmlStr[htmlChar]=="/") {
+                        let compactEl = document.createElement(lastTag.tagName);
+                        for(let attr in lastTag.attrs) compactEl.setAttribute(attr, lastTag.attrs[attr]);
+                        parsedElements.push(compactEl);
+                        inHTMLChar = 0;
+                        htmlChar += 2;
+                        lastTag = { attrs:{} };
+                    }
+                    console.log(lastTag);
+                /*} else if(inHTMLChar==2 && htmlStr[htmlChar]=="=") {
+                    lastAttr = charMetrices;
+                    charMetrices = "";
+                } else if(inHTMLChar==2 && inAttr!="" && htmlStr[parseInt(htmlChar)].trim()=="") {
+                    lastTag.attrs[lastAttr] = charMetrices;
+                    lastAttr = "";*/
+                } else if(inHTMLChar==2 && htmlStr[htmlChar]==">") {
+                    inHTMLChar = 3;
+                } else if(inHTMLChar==1 && (htmlStr[parseInt(htmlChar)].trim()=="" || htmlStr[htmlChar]==">")) {
+                    if(htmlStr[htmlChar]==">") inHTMLChar = 3; else inHTMLChar = 2;
+                    lastTag.tagName = charMetrices;
+                    charMetrices = "";
+                } else if(inHTMLChar==3 && htmlStr[htmlChar]=="<" && htmlStr[parseInt(htmlChar) + 1]=="/" && htmlStr.substr(htmlChar, lastTag.tagName.length + 3)==="</"+lastTag.tagName+">") {
+                    lastTag.children = [];
+                    lastTag.textContent = charMetrices;
+                    if(charMetrices!="") lastTag.children = parseHTMLComponent(lastTag.textContent);
+                    let compactEl = document.createElement(lastTag.tagName);
+                    for(let attr in lastTag.attrs) compactEl.setAttribute(attr, lastTag.attrs[attr]);
+                    if(Array.isArray(lastTag.children)) { for(let child in lastTag.children) compactEl.appendChild(lastTag.children[child]); } else if(lastTag.children instanceof HTMLElement || lastTag.children instanceof Text) compactEl.appendChild(lastTag.children); else throw "Tag child must be an array of child or HTMLElement or Text";
+                    parsedElements.push(compactEl);
+                    inHTMLChar = 0;
+                    htmlChar += lastTag.tagName.length + 2;
+                    lastTag = { attrs:{} };
+                    charMetrices = "";
+                } else if((inHTMLChar==1 || inHTMLChar==2) && htmlStr[htmlChar]=="/" && htmlStr[parseInt(htmlChar) + 1]==">") {
+                    let compactEl = document.createElement(lastTag.tagName);
+                    for(let attr in lastTag.attrs) compactEl.setAttribute(attr, lastTag.attrs[attr]);
+                    parsedElements.push(compactEl);
+                    inHTMLChar = 0;
+                    htmlChar += 2;
+                    lastTag = { attrs:{} };
+                } else if(htmlStr.length - 1==parseInt(htmlChar)) {
+                    if(inHTMLChar>0) throw "^Tag hasnt closed, please close specified tag "+lastTag.tagName; else if(charMetrices!="") {
+                        charMetrices += htmlStr[htmlChar];
+                        parsedElements.push(document.createTextNode(charMetrices));
+                    }
+                } else charMetrices += htmlStr[htmlChar];
+            } catch(PartialParseError) {
+                console.error(PartialParseError, htmlChar);
+            }
+        }
+        return parsedElements.length>1 ? parsedElements : parsedElements[0];
+    } catch(ParseError) {
+        console.error(ParseError);
+        return document.createTextNode("[Object error]");
+    }
+}
+
+export class HTMLBasedComponent extends Component{
+    constructor(props) {
+        super(props);
+        this.state = {
+            content: props.content || ""
+        };
+    }
+    
+    render(){
+        console.log(this.state.content);
+      const content = {
+        __dangerousHTML: typeof this.state.content=="string" ? this.state.content : ""
+      };
+      return <RawHTML>{'haha'}</RawHTML>;
+    }
+}
+
+        //return (<React.Fragment dangerouslySetInnerHTML={{ __html:format(strHTML, params)  }}></React.Fragment>);
+        //return <HTMLBasedComponent content={format(strHTML, params)}/>;
+        //return <><output>Kurwa</output>, <>        s       </>, <p>No ja pierdole!</p></>;
+
+        export function FloatingContainerNextToEvent(elEvent, evType="toggle", tgActiveClass="active") {
+    try {
+        if(!(elEvent instanceof Event) && elEvent.__proto__.constructor.name!=="SyntheticBaseEvent") throw "Not event type";
+        let currCont = elEvent.currentTarget;
+        for(let contChild in currCont.parentElement.children) {
+            console.log(contChild, currCont.parentElement.children[contChild]);
+            if(currCont.parentElement.children.hasOwnProperty(contChild) && currCont.parentElement.children[contChild]==currCont) {
+                let nextCont = currCont.parentElement.children[contChild + 1];
+                switch(evType) {
+                    case "toggle":
+                        nextCont.children[contChild].classList.toggle(tgActiveClass);
+                    break;
+                    case "add":
+                        nextCont.children[contChild].classList.add(tgActiveClass);
+                    break;
+                    case "remove":
+                        nextCont.children[contChild].classList.remove(tgActiveClass);
+                }
+                break;
+            }
+        }
+    } catch(EventError) {
+        console.error(EventError);
+    }
+}
+
+export function FloatingContainerNextToEvent(elEvent, evType="toggle", tgActiveClass="active") {
+    try {
+        if(!(elEvent instanceof Event) && elEvent.__proto__.constructor.name!=="SyntheticBaseEvent") throw "Not event type";
+        let currCont = elEvent.currentTarget;
+        for(let contChild in currCont.parentElement.children) {
+            if(currCont.children[contChild]==currCont) {
+                let nextCont = currCont.children[contChild + 1];
+                switch(evType) {
+                    case "toggle":
+                        nextCont.children[contChild].classList.toggle(tgActiveClass);
+                    break;
+                    case "add":
+                        nextCont.children[contChild].classList.add(tgActiveClass);
+                    break;
+                    case "remove":
+                        nextCont.children[contChild].classList.remove(tgActiveClass);
+                }
+                break;
+            }
+        }
+    } catch(EventError) {
+        console.error(EventError);
+    }
+}

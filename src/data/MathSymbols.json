@@ -1,0 +1,93 @@
+{
+    "list":[
+        {
+            "name":{
+                "en":"Greek small letter PI",
+                "pl-PL":"Mała litera grecka PI",
+                "pl":"Mała litera grecka PI"
+            },
+            "description":{
+                "en":"",
+                "pl-PL":"",
+                "pl":""
+            },
+            "char":"π",
+            "unicodePoint":"U+03C0",
+            "htmlEntityName":"&pi;",
+            "htmlEntityHexCodes":["&#x03C0;"],
+            "htmlEntityDecimalCodes":["&#960;"],
+            "category":"Greek letters",
+            "subcategoryName":"mathCategory",
+            "mathCategory":"constans",
+            "addingDate":"2020-11-28 02:11:19",
+            "lastUpdateDate":"2020-11-28 02:11:19"
+        },
+        {
+            "name":{
+                "en":"Latin small letter open e",
+                "pl-PL":"Łacińska mała otwarta litera e",
+                "pl":"Łacińska mała otwarta litera e"
+            },
+            "synonyms":{
+                "en":["Euler constans"],
+                "pl-PL":["Stała eulera"],
+                "pl":["Stała eulera"]
+            },
+            "description":{
+                "en":"",
+                "pl-PL":"",
+                "pl":""
+            },
+            "char":"ɛ",
+            "unicodePoint":"U+025B",
+            "htmlEntityName":"",
+            "htmlEntityHexCodes":["&#x2107;"],
+            "htmlEntityDecimalCodes":["&#8455;"],
+            "category":"Latin letters",
+            "subcategoryName":"mathCategory",
+            "mathCategory":"constans",
+            "addingDate":"2020-11-28 02:11:19",
+            "lastUpdateDate":"2020-11-28 02:11:19"
+        },
+        {
+            "name":{
+                "en":"Greek capital letter delta",
+                "pl-PL":"Wielka litera grecka delta",
+                "pl":"Wielka litera grecka delta"
+            },
+            "description":{
+
+            },
+            "char":"Δ",
+            "unicodePoint":"U+0394",
+            "htmlEntityName":"",
+            "htmlEntityHexCodes":["&#x394;"],
+            "htmlEntityDecimalCodes":["&#916;"],
+            "category":"Greek letters",
+            "subcategoryName":"mathCategory",
+            "mathCategory":"variables",
+            "addingDate":"2020-11-28 02:11:19",
+            "lastUpdateDate":"2020-11-28 02:11:19"
+        },
+        {
+            "name":{
+                "en":"Greek small letter delta",
+                "pl-PL":"Mała litera grecka delta",
+                "pl":"Mała litera grecka delta"
+            },
+            "description":{
+
+            },
+            "char":"δ",
+            "unicodePoint":"U+03B4",
+            "htmlEntityName":"&delta;",
+            "htmlEntityHexCodes":["&#x03B4;"],
+            "htmlEntityDecimalCodes":["&#948;"],
+            "category":"Greek letters",
+            "subcategoryName":"mathCategory",
+            "mathCategory":"variables",
+            "addingDate":"2020-11-28 02:11:19",
+            "lastUpdateDate":"2020-11-28 02:11:19"
+        }
+    ]
+}

@@ -1,0 +1,215 @@
+{
+    "universal":[
+        {
+            "id":"unit",
+            "sign":{
+                "en":"u",
+                "pl":"j"
+            },
+            "name":{
+                "en":"Unit",
+                "pl":"Jednostka",
+                "pl-PL":"Jednostka"
+            },
+            "postfix":{
+                "en":"units",
+                "pl":"jednostek",
+                "pl-PL":"jednostek"
+            },
+            "categories":""
+        },
+        {
+            "sign":{
+                "en":"u^2",
+                "pl":"j^2",
+                "pl-PL":"j^2"
+            },
+            "name":{
+                "en":"Squere unit",
+                "pl":"Jednostka kwadratowa",
+                "pl-PL":"Jednostka kwadratowa"
+            },
+            "postfix":{
+                "en":"squere units",
+                "pl":"jednostek kwadratowych",
+                "pl-PL":"jednostek kwadratowych"
+            },
+            "notation":"x"
+        },
+        {
+            "sign":{
+                "en":"u^3",
+                "pl":"j^3",
+                "pl-PL":"j^3"
+            },
+            "name":{
+                "en":"Cubic unit",
+                "pl":"Jednostka sześcienna",
+                "pl-PL":"Jednostka sześcienna"
+            },
+            "postfix":{
+                "en":"cubic units",
+                "pl":"jednostek sześciennych",
+                "pl-PL":"jednostek sześciennych"
+            },
+            "notation":"x^2"
+        }
+    ],
+    "temperature":[
+        {
+            "sign":"°C",
+            "name":{
+                "en":"Celsius degrees",
+                "pl":"Stopnie celsjusza",
+                "pl-PL":"Stopnie celsjusza"
+            },
+            "postfix":{
+                "en":"celsius degrees",
+                "pl":"stopni celsjusza",
+                "pl-PL":"stopni celsjusza"
+            },
+            "notation":"273,15",
+            "operation":"-"
+        },
+        {
+            "sign":"K",
+            "name":"Kelvin",
+            "postfix":{
+                "en":"kelvins",
+                "pl":"kelwinów",
+                "pl-PL":"kelwinów"
+            },
+            "categories":["SI"]
+        },
+        {
+            "sign":"°F",
+            "name":{
+                "en":"Fahrenheit",
+                "pl":"Skala Fahrenheita",
+                "pl-PL":"Skala Fahrenheita"
+            },
+            "postfix":{
+                "en":"",
+                "pl":"fahrenheitów",
+                "pl-PL":"fahrenheitów"
+            },
+            "notation":"459,67",
+            "operation":"-"
+        }
+    ],
+    "length":[
+        {
+            "sign":"mm",
+            "name":{
+                "en":"Milimeter",
+                "pl":"Milimetr",
+                "pl-PL":"Milimetr"
+            },
+            "postfix":{
+                "en":"milmeters",
+                "pl":"milimetrów",
+                "pl-PL":"milimetrów"
+            },
+            "notation":"10^-3"
+        },
+        {
+            "sign":"cm",
+            "name":{
+                "en":"Centymeters",
+                "pl":"Centymetr",
+                "pl-PL":"Centymetr"
+            },
+            "postfix":{
+                "en":"centymeters",
+                "pl":"centymetrów",
+                "pl-PL":"centymetrów"
+            }
+        },
+        {
+            "sign":"dm"
+        },
+        {
+            "sign":"m",
+            "name":{
+                "en":"Meter",
+                "pl":"Metr",
+                "pl-PL":"Metr"
+            },
+            "postfix":{
+                "en":"meters",
+                "pl":"metrów",
+                "pl-PL":"metrów"
+            }
+        },
+        {
+            "sign":"m^2",
+            "name":{
+                "en":"Squere meter",
+                "pl":"Metr kwadratowy",
+                "pl-PL":"Metr kwadratowy"
+            },
+            "postfix":{
+                "en":"squere meters",
+                "pl":"metrów kwadratowych",
+                "pl-PL":"metrów kwadratowych"
+            },
+            "notation":"x"
+        },
+        {
+            "sign":"m^3",
+            "name":{
+                "en":"Cubic meter",
+                "pl":"Metr sześcienny",
+                "pl-PL":"Metr sześcienny"
+            },
+            "postfix":{
+                "en":"cubic meters",
+                "pl":"metrów sześciennych",
+                "pl-PL":"metrów sześciennych"
+            },
+            "notation":"x^2"
+        },
+        {
+            "sign":"km",
+            "name":{
+                "en":"Kilometer",
+                "pl":"Kilometr",
+                "pl-PL":"Kilomentr"
+            },
+            "postfix":{
+                "en":"kilometers",
+                "pl":"kilometrów",
+                "pl-PL":"kilomentrów"
+            },
+            "notation":"10^3"
+        },
+        {
+            "sign":"ha",
+            "name":{
+                "en":"Hectare",
+                "pl":"Hektar",
+                "pl-PL":"Hektar"
+            },
+            "postfix":{
+                "en":"hectares",
+                "pl":"hektarów",
+                "pl-PL":"hektarów"
+            },
+            "notation":"10000x"
+        },
+        {
+            "sign":"ar",
+            "name":{
+                "en":"Ar",
+                "pl":"Ar",
+                "pl-PL":"Ar"
+            },
+            "postfix":{
+                "en":"ares",
+                "pl":"arów",
+                "pl-PL":"arów"
+            },
+            "notation":"100x"
+        }
+    ]
+}

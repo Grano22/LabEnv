@@ -1,0 +1,199 @@
+/* MathEnv Calc | Grano22 | V.1 */
+#mathEnvCalc-top {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #747b8f;
+}
+
+#mathEnvCalc-top section {
+    padding: 20px;
+}
+
+#mathEnvCalc-top section h4 {
+    margin: 0;
+    font-size: 25px;
+}
+
+#mathEnvCalc-top section.navCenter {
+    text-align: center;
+}
+
+#mathEnvCalc-menu {
+    width: 100%;
+    display: inline-block;
+
+}
+
+#mathEnvCalc-menuCat {
+    display: grid;
+    width: 100%;
+    background: #b0b0b0; /* #bfbfbf; */
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+}
+
+#mathEnvCalc-menuCat div.mathEnvCalc-catItem {
+    text-align: center;
+    padding: 3px 4px;
+}
+
+#mathEnvCalc-menuCat div.mathEnvCalc-catItem:hover {
+    background: #a3a3a3;
+    cursor: pointer;
+}
+
+#mathEnvCalc-menuCat div.mathEnvCalc-catItem.selected {
+    background: #707a82;
+}
+
+#mathEnvCalc-menuContent {
+    background: #c0c1c2;
+    
+}
+
+#mathEnvCalc-formulaBar {
+    width: 100%;
+    display: flex;
+    border-top: 2px solid #919191;
+}
+
+#mathEnvCalc-formulaBar #mathEnvCalc-currCell, #mathEnvCalc-formulaBar #mathEnvCalc-formula {
+    padding: 12px;
+    background: #ccc;
+    border: none;
+    border-right: 2px solid #919191;
+}
+
+#mathEnvCalc-formulaBar #mathEnvCalc-currCell {
+    width: 100px;
+}
+
+#mathEnvCalc-formulaBar #mathEnvCalc-formula {
+    flex: 1;
+}
+
+#mathEnvCalc-formulaSection {
+    display: flex;
+    flex: 1;
+}
+
+#mathEnvCalc-formulaBar #mathEnvCalc-funcBtn {
+    border: none;
+    border-right: 2px solid #919191;
+    padding: 12px;
+    background: #bdbdbd;
+    margin: 0;
+    font-weight: bolder;
+}
+
+#mathEnvCalc-formulaBar #mathEnvCalc-funcBtn:hover {
+    background: #ababab;
+}
+
+#mathEnvCalc-gridContainer {
+    
+}
+
+#mathEnvCalc-gridContainer table {
+    width: 100%;
+    border-collapse: collapse;
+    display: flex;
+}
+
+#mathEnvCalc-gridContainer table thead {
+    display: inline-block;
+    border-top: 2px solid #999; /* #aaa */
+    background: #bdbdbd;
+    z-index: 19;
+}
+
+#mathEnvCalc-gridContainer table thead th {
+    height: 24px;
+    border-bottom: 2px solid #999;
+    -webkit-box-sizing:border-box;
+    -moz-box-sizing:border-box;
+    -ms-box-sizing:border-box;
+    box-sizing: border-box;
+    /*border-right: 2px solid #8d8c8c;*/
+}
+
+#mathEnvCalc-gridContainer table thead th.separator {
+    height: 0;
+    background: none;
+    border-bottom: none;
+}
+
+#mathEnvCalc-gridContainer table tbody {
+    display: inline-block;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+#mathEnvCalc-gridContainer table tbody th {
+    background: #bdbdbd;
+}
+
+#mathEnvCalc-gridContainer table tbody th, #mathEnvCalc-gridContainer table tbody td {
+    border: 2px solid #999;
+    -webkit-box-sizing:border-box;
+    -moz-box-sizing:border-box;
+    -ms-box-sizing:border-box;
+    box-sizing: border-box;
+    /*padding: 10px;*/
+    height: 25px;
+    cursor: cell;
+}
+
+#mathEnvCalc-gridContainer table td:hover {
+    border-color: #777;
+}
+
+#mathEnvCalc-gridContainer table td, #mathEnvCalc-gridContainer table td.horizontaly {
+    min-width: 120px;
+}
+
+#mathEnvCalc-gridContainer table tbody td span.mathEnv-cellCorner {
+    position: absolute;
+    display: none;
+    right: -8px; bottom: -8px;
+    width: 12px; height: 12px;
+    border: 1px solid #fff;
+    background: #999;
+    cursor: crosshair;
+}
+
+#mathEnvCalc-gridContainer table tbody td.mathEnv-cell.selected span.mathEnv-cellCorner {
+    display: block;
+}
+
+#mathEnvCalc-gridContainer table tbody td.mathEnv-cell {
+    position: relative;
+}
+
+#mathEnvCalc-gridContainer table tbody td.mathEnv-cell var {
+    font-style: normal;
+    padding: 0 2px;
+    overflow: hidden;
+}
+
+#mathEnvCalc-gridContainer table tbody td.mathEnv-cell.selected {
+    /*border-width: 4px;
+    border-color: #8a8a8a;*/
+    outline: 4px solid #8a8a8a;
+    outline-offset: -2px;
+    cursor: move;
+    -webkit-box-sizing:border-box;
+    -moz-box-sizing:border-box;
+    -ms-box-sizing:border-box;
+    box-sizing: border-box;
+    z-index: 90;
+}
+
+.halfTriangle {
+    background: linear-gradient(130deg, transparent 50%, #999 50%);
+    width: 100%; height: 100%;
+    display: block;
+    /*background-position: center; background-size: 50%;
+    background-repeat: no-repeat;*/
+}

@@ -1,0 +1,47 @@
+{
+    "dict":{
+        "title":{
+            "langs":{
+                "en":"Unit converter",
+                "pl":"Konwerter jednostek",
+                "pl-PL":"Konwerter jednostek"
+            }
+        },
+        "conversionOutputTypes":{
+            "items":[
+                {
+                    "id":"fullNumber",
+                    "langs":{
+                        "en":"Full number",
+                        "pl":"Pełna liczba",
+                        "pl-PL":"Pełna liczba"
+                    }
+                },
+                {
+                    "id":"scienceNotation",
+                    "langs":{
+                        "en":"Science notation",
+                        "pl":"Notacja wykładnicza/naukowa",
+                        "pl-PL":"Notacja wykładnicza/naukowa"
+                    }
+                },
+                {
+                    "id":"unifiedRounding",
+                    "langs":{
+                        "en":"Unified rounding",
+                        "pl":"Ogólne zaokrąglenie",
+                        "pl-PL":"Ogólne zaokrąglenie"
+                    }
+                },
+                {
+                    "id":"customRounding",
+                    "langs":{
+                        "en":"Custom rounding",
+                        "pl":"Własne zasady zaokrągleń",
+                        "pl-PL":"Własne zasady zaokrągleń"
+                    }
+                }
+            ]
+        }
+    }
+}
