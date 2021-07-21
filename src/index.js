@@ -13,13 +13,18 @@ Jumper.Console.init(true, {
 console.log(Jumper.Console.byLabel("jumper"), "Welcome to jumper!");
 console.log(Jumper.Console);
 
+const Routing = (<Router>
+  <Route path="/*" component={App}/>
+</Router>);
+
 //React.StrictMode
-ReactDOM.render(
-    (<Router>
-      <Route path="/*" component={App}/>
-    </Router>),
-  document.getElementById('root')
-);
+var targetContainer = document.getElementById('root');
+if(targetContainer!=null) {
+  ReactDOM.render(
+      Routing,
+      targetContainer
+  );
+} else console.error("React runtime error, lack of root container");
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))

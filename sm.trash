@@ -1333,7 +1333,7 @@ export class HTMLBasedComponent extends Component{
 
         //return (<React.Fragment dangerouslySetInnerHTML={{ __html:format(strHTML, params)  }}></React.Fragment>);
         //return <HTMLBasedComponent content={format(strHTML, params)}/>;
-        //return <><output>Kurwa</output>, <>        s       </>, <p>No ja pierdole!</p></>;
+        //return <><output></output>, <>        s       </>, <p></p></>;
 
         export function FloatingContainerNextToEvent(elEvent, evType="toggle", tgActiveClass="active") {
     try {
